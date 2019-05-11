@@ -1,0 +1,22 @@
+---
+title: "output"
+author: "Joe Powers"
+date: "3/12/2018"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+
+# Note that Rmd files use their own directory as the wd, 
+# while R files use the project directory as their wd.
+file_ds_small <- "../data/ds_small.rds"
+
+ds_small <- read_rds(file_ds_small)
+
+ds_small %>% 
+  ggplot(aes(x = wt, y = mpg, color = am)) + 
+  geom_jitter() + 
+  geom_smooth()
+```
+

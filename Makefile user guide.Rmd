@@ -1,0 +1,62 @@
+---
+title: "Makefile"
+author: "Joe Powers"
+date: "3/7/2018"
+output: html_document
+---
+
+# 
+RENDER = Rscript -e "require(rmarkdown); render('$<')" # for reports
+KNIT = Rscript -e "require(knitr); knit('$<')" # for Rmd scripts
+# These variables will knit or render the first prerequisite of your target,
+# which should be the script that makes the target. 
+# $(RENDER) can replace Rscript -e "rmarkdown::render('analysis/500_corr_table.Rmd')"
+
+# combine two variables into one.
+RENDREP = $(RENDER); mv $(<:.Rmd=.html) $(REP)
+RENDREPT = $(RENDER); mv $(ANL)/$@ $(REP) # does not work same effect as above function
+RENDREPT = $(RENDER); mv $(ANL)/$@ reports # works same effect as above function#
+
+
+In your shell navigate to the directory that houses your Makefile.
+
+Type `make` in shell to build.
+
+Type `make clean` to "reset". clean is a target defined in my make file. 
+
+Type `make clean all` to "reset and rebuild"
+
+## Shortcoming:
+Say you change 200_. `make` will run 200_ and 300_ even though 300 was not changed.
+
+A potential problem emerges if 100_ outputs a file using a name that 200_ and 300_ also update and output. When you `make` after editing 200_, it reads in data that was updated from a previous make.
+
+## Solns:
+The goal is to make a munge workflow that requires to attention from the munger. Just a good plan. 
+__ explore ways to cluster dependencies per each file
+  - rename data after time instense pulls and transformations. 
+__ read the make manual for ways to protect against overwritten data_sets
+  - perhaps I could define a series of targets with their own prerequisites, then remove targets as needed and rerun the make for that target like `make that`
+__ explore online for ways to protect against overwritten data_sets
+
+# VPATH
+
+# https://www.cmcrossroads.com/article/basics-vpath-and-vpath
+#  VPATH is a list of directories to be searched for missing prerequisites.
+# if Make cant find a prereq it will search the directories in the VPATH list
+# and stop at the first directory in which it finds the missing prerequisite
+
+VPATH = $(MDIR) $(DDIR) $(ADIR)
+
+The vpath directive has both a search path and a pattern.  Only missing 
+prerequisites matching the pattern are searched using the associated path.
+
+vpath %.h /usr/include
+
+# RENDREPORT
+RENDREPORT = Rscript -e "require(rmarkdown); render('$<')"; mv $<.html $(RDIR)
+above needs something like 
+This next line changes ".cpp" to ".o" in the SOURCES files names.
+OBJECTS=$(SOURCES:.cpp=.o) 
+
+# Something called "makedepend"
